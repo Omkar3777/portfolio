@@ -2,24 +2,9 @@ const express = require("express");
 const router = express.Router();
 const HomeSettings = require("../models/HomeSettings");
 const HomeContent = require("../models/HomeContent");
-const multer = require("multer");
-const path = require("path");
 
 /* =====================================================
-   🔹 MULTER CONFIG
-===================================================== */
-
-const storage = multer.diskStorage({
-  destination: "./uploads",
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
-});
-
-const upload = multer({ storage });
-
-/* =====================================================
-   🔹 RESUME SECTION
+   🔹 RESUME SECTION (URL BASED - FIXED)
 ===================================================== */
 
 // GET Resume
@@ -32,8 +17,8 @@ router.get("/resume", async (req, res) => {
   }
 });
 
-// Upload / Update Resume
-router.post("/resume", upload.single("resume"), async (req, res) => {
+// POST / UPDATE Resume (NOW USING URL)
+router.post("/resume", async (req, res) => {
   try {
     let settings = await HomeSettings.findOne();
 
@@ -41,14 +26,18 @@ router.post("/resume", upload.single("resume"), async (req, res) => {
       settings = new HomeSettings();
     }
 
-    if (req.file) {
-      settings.resume = req.file.filename;
-    }
+    // ✅ Save resume URL instead of file
+    settings.resume = req.body.resume;
 
     await settings.save();
-    res.json(settings);
+
+    res.json({
+      message: "Resume updated successfully ✅",
+      data: settings,
+    });
 
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -67,16 +56,21 @@ router.get("/content", async (req, res) => {
   }
 });
 
-// UPDATE Full Home Content
-router.put("/content", upload.single("logo"), async (req, res) => {
+// UPDATE Full Home Content (SAFE JSON PARSE)
+router.put("/content", async (req, res) => {
   try {
-    const existing = await HomeContent.findOne();
-    const data = JSON.parse(req.body.data);
+    let data;
 
-    // Attach logo if uploaded
-    if (req.file && data.brands && data.brands.length > 0) {
-      data.brands[data.brands.length - 1].logo = req.file.filename;
+    // ✅ Safe JSON parsing
+    try {
+      data = typeof req.body.data === "string"
+        ? JSON.parse(req.body.data)
+        : req.body.data;
+    } catch (error) {
+      return res.status(400).json({ error: "Invalid JSON format ❌" });
     }
+
+    const existing = await HomeContent.findOne();
 
     if (existing) {
       const updated = await HomeContent.findByIdAndUpdate(
@@ -84,13 +78,21 @@ router.put("/content", upload.single("logo"), async (req, res) => {
         data,
         { new: true }
       );
-      res.json(updated);
-    } else {
-      const created = await HomeContent.create(data);
-      res.json(created);
+      return res.json({
+        message: "Home content updated ✅",
+        data: updated,
+      });
     }
 
+    const created = await HomeContent.create(data);
+
+    res.json({
+      message: "Home content created ✅",
+      data: created,
+    });
+
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });

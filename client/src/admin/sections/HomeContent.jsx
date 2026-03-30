@@ -14,6 +14,10 @@ function HomeContentSection() {
   const [resume, setResume] = useState(null);
   const [currentResume, setCurrentResume] = useState(null);
 
+  const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+
   useEffect(() => {
     fetchHome();
     fetchResume();
@@ -25,7 +29,10 @@ function HomeContentSection() {
       const res = await API.get("/home/content");
       if (res.data) setHome(res.data);
     } catch (err) {
-      console.log(err);
+      console.error(err);
+      setError("Failed to load home content ❌");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -35,7 +42,8 @@ function HomeContentSection() {
       const res = await API.get("/home/resume");
       setCurrentResume(res.data?.resume);
     } catch (err) {
-      console.log(err);
+      console.error(err);
+      setError("Failed to load resume ❌");
     }
   };
 
@@ -47,7 +55,8 @@ function HomeContentSection() {
       });
       alert("Home Content Updated 🚀");
     } catch (err) {
-      console.log(err);
+      console.error(err);
+      alert("Update failed ❌");
     }
   };
 
@@ -56,6 +65,8 @@ function HomeContentSection() {
     e.preventDefault();
 
     if (!resume) return;
+
+    setUploading(true);
 
     const formData = new FormData();
     formData.append("resume", resume);
@@ -69,17 +80,34 @@ function HomeContentSection() {
       fetchResume();
       setResume(null);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       alert("Upload Failed ❌");
+    } finally {
+      setUploading(false);
     }
   };
+
+  // 🔄 Loading UI
+  if (loading) {
+    return <p className="text-gray-400">Loading...</p>;
+  }
 
   return (
     <div className="space-y-16 max-w-3xl">
 
+      {/* ERROR */}
+      {error && (
+        <div className="text-red-400 bg-red-500/10 p-4 rounded-xl">
+          {error}
+        </div>
+      )}
+
       {/* ================= RESUME UPLOAD ================= */}
       <div className="bg-white/5 p-8 rounded-2xl border border-white/10 space-y-4">
-        <h2 className="text-2xl font-semibold">Upload Latest Resume</h2>
+
+        <h2 className="text-2xl font-semibold">
+          Upload Latest Resume
+        </h2>
 
         {currentResume && (
           <p className="text-green-400 text-sm">
@@ -88,6 +116,7 @@ function HomeContentSection() {
         )}
 
         <form onSubmit={handleResumeUpload} className="space-y-4">
+
           <input
             type="file"
             accept=".pdf"
@@ -98,11 +127,14 @@ function HomeContentSection() {
 
           <button
             type="submit"
-            className="bg-purple-500 hover:bg-purple-400 px-6 py-3 rounded-xl font-semibold"
+            disabled={uploading}
+            className="bg-purple-500 hover:bg-purple-400 px-6 py-3 rounded-xl font-semibold disabled:opacity-50"
           >
-            Upload Resume
+            {uploading ? "Uploading..." : "Upload Resume"}
           </button>
+
         </form>
+
       </div>
 
     </div>
