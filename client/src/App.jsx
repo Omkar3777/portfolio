@@ -5,7 +5,7 @@ import Projects from "./pages/Projects";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Dashboard from "./admin/Dashboard";
-
+import Login from "./pages/Login";
 
 function App() {
   return (
@@ -18,6 +18,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/admin" element={<Dashboard />}/>
+        <Route path="/login" element={<Login />} />
 
         {/* Protected Admin Panel */}
         <Route

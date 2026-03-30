@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Header() {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <header className="fixed top-0 left-0 w-full z-50 backdrop-blur-xl bg-black/60 border-b border-white/10">
@@ -18,7 +19,8 @@ function Header() {
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex gap-8 text-white font-medium">
+        <div className="hidden md:flex items-center gap-8 text-white font-medium">
+
           <Link to="/" className="hover:text-cyan-400 transition">
             Home
           </Link>
@@ -31,6 +33,17 @@ function Header() {
           <Link to="/contact" className="hover:text-cyan-400 transition">
             Contact
           </Link>
+
+          {/* 🔥 EDIT BUTTON */}
+          <button
+            onClick={() => navigate("/login")}
+            className="ml-4 px-4 py-1.5 rounded-lg text-sm font-semibold 
+            bg-gradient-to-r from-cyan-500 to-purple-500 
+            hover:scale-105 transition"
+          >
+            Edit
+          </button>
+
         </div>
 
         {/* Mobile Toggle */}
@@ -45,10 +58,24 @@ function Header() {
       {/* Mobile Menu */}
       {open && (
         <div className="md:hidden bg-black border-t border-white/10 px-6 py-6 flex flex-col gap-6 text-white">
+
           <Link to="/" onClick={() => setOpen(false)}>Home</Link>
-            <Link to="/about" onClick={() => setIsOpen(false)}>About</Link>
+          <Link to="/about" onClick={() => setOpen(false)}>About</Link>
           <Link to="/projects" onClick={() => setOpen(false)}>Projects</Link>
           <Link to="/contact" onClick={() => setOpen(false)}>Contact</Link>
+
+          {/* 🔥 MOBILE EDIT BUTTON */}
+          <button
+            onClick={() => {
+              setOpen(false);
+              navigate("/login");
+            }}
+            className="mt-4 px-4 py-2 rounded-lg text-sm font-semibold 
+            bg-gradient-to-r from-cyan-500 to-purple-500"
+          >
+            Edit
+          </button>
+
         </div>
       )}
     </header>

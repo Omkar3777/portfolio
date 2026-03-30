@@ -151,12 +151,12 @@ function Contact() {
 
                   <div>
                     <p className="text-white font-medium">Email</p>
-                    <p>omkar@example.com</p>
+                    <p>omkarjadhav3777@gmail.com</p>
                   </div>
 
                   <div>
                     <p className="text-white font-medium">Location</p>
-                    <p>Bengaluru, India</p>
+                    <p>Pune, India</p>
                   </div>
 
                   <div>
