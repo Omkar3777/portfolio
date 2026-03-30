@@ -9,7 +9,10 @@ const app = express();
    🔹 CORS (ALLOW ALL FOR NOW)
 ===================================================== */
 app.use(cors({
-  origin: "*",
+  origin: [
+    "https://portfolio-alpha-two-7g5kjc98sx.vercel.app"
+  ],
+  credentials: true,
 }));
 
 /* =====================================================
