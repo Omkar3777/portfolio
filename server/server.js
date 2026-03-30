@@ -10,6 +10,7 @@ const app = express();
 ===================================================== */
 app.use(cors({
   origin: [
+    "http://localhost:5173",
     "https://portfolio-alpha-two-7g5kjc98sx.vercel.app"
   ],
   credentials: true,
